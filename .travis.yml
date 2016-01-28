@@ -1,0 +1,17 @@
+language: python
+python:
+  - "3.3"
+  - "3.4"
+  - "3.5"
+
+install:
+    - pip install -r supported_pkgs.txt
+    - pip install coveralls
+script:
+  - coverage combine
+  - coverage report -m
+  - python -bb -m coverage run -p --source=serialize --omit="*test*" setup.py test
+
+after_script:
+  - coveralls --verbose
+
