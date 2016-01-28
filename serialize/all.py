@@ -206,7 +206,8 @@ MISSING = object()
 def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, extension=MISSING):
     """Register an available serialization format.
 
-    `fmt` is a unique string identifying the format, such as `json`.
+    `fmt` is a unique string identifying the format, such as `json`. Use a colon (`:`) to
+    separate between subformats.
 
     `dumpser` and `dumper` should be callables with the same purpose and arguments
     that `json.dumps` and `json.dump`. If one of those is missing, it will be
@@ -217,9 +218,8 @@ def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, e
     generated automatically from the other.
 
     `extension` is the file extension used to guess the desired serialization format when loading
-    from or dumping to a file. If not given, `fmt` will be used.
-    If `None`, the format will not be associated with any extension (use for serialization formats
-    with multiple subformats in which you want to select a default).
+    from or dumping to a file. If not given, the part before the colon of `fmt` will be used.
+    If `None`, the format will not be associated with any extension.
     """
 
     # For simplicity. We do not allow to overwrite format.
@@ -259,11 +259,11 @@ def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, e
         loader = loadser = raiser
 
     if extension is MISSING:
-        extension = fmt
+        extension = fmt.split(':', 1)[0]
 
     FORMATS[fmt] = Format(extension, dumper, dumpser, loader, loadser)
 
-    if extension:
+    if extension and extension not in FORMAT_BY_EXTENSION:
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
 
 
@@ -277,13 +277,12 @@ def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
     if pkg:
         msg = 'This serialization format requires the %s package.' % pkg
 
-
     if extension is MISSING:
-        extension = fmt
+        extension = fmt.split(':', 1)[0]
 
     UNAVAILABLE_FORMATS[fmt] = UnavailableFormat(extension, msg)
 
-    if extension:
+    if extension and extension not in FORMAT_BY_EXTENSION:
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
 
 
@@ -329,7 +328,7 @@ def load(filename_or_file, fmt=None):
         if fmt is None:
             _, ext = splitext(filename_or_file)
             fmt = _get_format_from_ext(ext.strip('.'))
-        with open(filename_or_file, 'wb') as fp:
+        with open(filename_or_file, 'rb') as fp:
             return load(fp, fmt)
 
     return _get_format(fmt).load(filename_or_file)

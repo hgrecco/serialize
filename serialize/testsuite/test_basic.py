@@ -4,7 +4,8 @@ import os
 from unittest import TestCase, skipIf
 
 from serialize import register_class, loads, dumps, load, dump
-from serialize.all import (FORMATS, UNAVAILABLE_FORMATS, _get_format_from_ext,
+from serialize.all import (FORMATS, UNAVAILABLE_FORMATS,
+                           _get_format_from_ext, _get_format,
                            register_format)
 
 
@@ -102,7 +103,25 @@ class _TestEncoderDecoder:
         # dump / load
         self.assertEqual(obj, load(buf, self.FMT))
 
+    def test_file_by_name(self):
+        fh = _get_format(self.FMT)
+        obj = dict(answer=42)
 
+        filename1 = 'tmp.' + fh.extension
+        dump(obj, filename1)
+        try:
+            obj1 = load(filename1)
+            self.assertEqual(obj, obj1)
+        finally:
+            os.remove(filename1)
+
+        filename2 = 'tmp.' + fh.extension + '.bla'
+        dump(obj, filename2, fmt=self.FMT)
+        try:
+            obj2 = load(filename2, fmt=self.FMT)
+            self.assertEqual(obj, obj2)
+        finally:
+            os.remove(filename2)
 
     def test_format_from_ext(self):
         if ':' in self.FMT:

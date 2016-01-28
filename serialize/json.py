@@ -44,4 +44,4 @@ def loads(content):
 # The first (default) is compact, the second is pretty.
 
 all.register_format('json', dumps, loads)
-all.register_format('json:pretty', dumps_pretty, loads, extension=None)
+all.register_format('json:pretty', dumps_pretty, loads)
