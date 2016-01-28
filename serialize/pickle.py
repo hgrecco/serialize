@@ -16,7 +16,7 @@ from . import all
 try:
     import pickle
     import copyreg
-except ImportError:
+except ImportError: # pragma: no cover
     all.register_unavailable('pickle', pkg='pickle')
     raise
 

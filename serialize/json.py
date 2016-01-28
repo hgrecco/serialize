@@ -15,7 +15,7 @@ from . import all
 
 try:
     import json
-except ImportError:
+except ImportError: # pragma: no cover
     all.register_unavailable('json', pkg='json')
     raise
 
