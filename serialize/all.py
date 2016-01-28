@@ -326,8 +326,9 @@ def load(filename_or_file, fmt=None):
     """
 
     if isinstance(filename_or_file, str):
-        _, ext = splitext(filename_or_file)
-        fmt = _get_format_from_ext(ext)
+        if fmt is None:
+            _, ext = splitext(filename_or_file)
+            fmt = _get_format_from_ext(ext.strip('.'))
         with open(filename_or_file, 'wb') as fp:
             return load(fp, fmt)
 
