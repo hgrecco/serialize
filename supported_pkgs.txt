@@ -3,4 +3,4 @@ dill
 msgpack-python
 phpserialize
 serpent
-yaml
+pyyaml
