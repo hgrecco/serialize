@@ -37,13 +37,6 @@ class Loader(yaml.Loader):
         dct = super().construct_mapping(node, deep)
         return all.decode(dct)
 
-    def construct_yaml_map(self, node):
-        data = {}
-        yield data
-        value = self.construct_mapping(node)
-        if isinstance(value, dict):
-            data.update(value)
-
 
 def dumps(obj):
     return yaml.dump(obj, Dumper=Dumper).encode('utf-8')
