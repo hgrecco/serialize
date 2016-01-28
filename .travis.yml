@@ -1,12 +1,18 @@
 language: python
+
 python:
   - "3.3"
   - "3.4"
   - "3.5"
 
+env:
+  - EXTRAS="N"
+  - EXTRAS="Y"
+
 install:
-    - pip install -r supported_pkgs.txt
+    - if [ $EXTRAS == 'Y' ]; then pip install r supported_pkgs.txt; fi
     - pip install coveralls
+
 script:
   - python -bb -m coverage run -p --source=serialize --omit="*test*" setup.py test
   - coverage combine

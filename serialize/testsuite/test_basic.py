@@ -1,11 +1,9 @@
 
+import os
+from unittest import TestCase, skipIf
 
-from unittest import TestCase
-
-
-from serialize import register_class, loads, dumps
-
-from serialize.all import FORMATS, UNAVAILABLE_FORMATS
+from serialize import register_class, loads, dumps, load, dump
+from serialize.all import FORMATS, UNAVAILABLE_FORMATS, _get_format_from_ext
 
 
 class X:
@@ -40,8 +38,9 @@ def from_builtin(content):
 register_class(X, to_builtin, from_builtin)
 
 
-class TestAllAvailable(TestCase):
+class TestAvailable(TestCase):
 
+    @skipIf(os.environ.get('EXTRAS', None) == 'N', 'Extras not installed')
     def test_available(self):
         self.assertFalse(UNAVAILABLE_FORMATS)
 
@@ -71,6 +70,10 @@ class _TestEncoderDecoder:
 
     def _test_round_trip(self, obj):
         self.assertEqual(obj, loads(dumps(obj, self.FMT), self.FMT))
+
+    def test_format_from_ext(self):
+        fh = FORMATS[self.FMT]
+        self.assertEqual(_get_format_from_ext(fh.extension), self.FMT)
 
     def test_response_bytes(self):
 
@@ -108,8 +111,23 @@ class _TestEncoderDecoder:
         self._test_round_trip(c)
 
 
+class _TestUnavailable:
+
+    def test_raise(self):
+        self.assertRaises(ValueError, dumps, 'hello', self.FMT)
+
+    def test_raise_from_ext(self):
+        self.assertRaises(ValueError, dumps, 'hello', self.FMT)
+
+
 for key in FORMATS.keys():
     name = "TestEncoderDecoder_%s" % key
     globals()[name] = type(name,
                            (_TestEncoderDecoder, TestCase),
+                           dict(FMT=key))
+
+for key in UNAVAILABLE_FORMATS.keys():
+    name = "TestEncoderDecoder_%s" % key
+    globals()[name] = type(name,
+                           (_TestUnavailable, TestCase),
                            dict(FMT=key))
