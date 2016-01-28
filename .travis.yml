@@ -10,7 +10,7 @@ env:
   - EXTRAS="Y"
 
 install:
-    - if [ $EXTRAS == 'Y' ]; then pip install r supported_pkgs.txt; fi
+    - if [ $EXTRAS == 'Y' ]; then pip install -r supported_pkgs.txt; fi
     - pip install coveralls
 
 script:
