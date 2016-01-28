@@ -52,7 +52,7 @@ def _get_format(fmt):
         return FORMATS[fmt]
 
     if fmt in UNAVAILABLE_FORMATS:
-        raise ValueError(("'%s' is an unavailable format. " % fmt) + UNAVAILABLE_FORMATS[fmt])
+        raise ValueError(("'%s' is an unavailable format. " % fmt) + UNAVAILABLE_FORMATS[fmt].msg)
 
     raise ValueError("'%s' is an unknown format. Valid options are %s" % (fmt, ', '.join(FORMATS.keys())))
 
@@ -281,7 +281,7 @@ def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
     if extension is MISSING:
         extension = fmt
 
-    FORMATS[fmt] = UnavailableFormat(extension, msg)
+    UNAVAILABLE_FORMATS[fmt] = UnavailableFormat(extension, msg)
 
     if extension:
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
