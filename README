@@ -1,5 +1,5 @@
-Serialize: A common API for multiple formats
-============================================
+Serialize: A common Python API for multiple serialization formats
+=================================================================
 
 There are multiple serialization formats out there ...
                         ... and great packages to use them.

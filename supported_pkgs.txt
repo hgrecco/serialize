@@ -1,6 +1,6 @@
 bson
 dill
-python-msgpack
+msgpack-python
 phpserialize
 serpent
 yaml
