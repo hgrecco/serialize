@@ -72,6 +72,8 @@ class _TestEncoderDecoder:
         self.assertEqual(obj, loads(dumps(obj, self.FMT), self.FMT))
 
     def test_format_from_ext(self):
+        if ':' in self.FMT:
+            return
         fh = FORMATS[self.FMT]
         self.assertEqual(_get_format_from_ext(fh.extension), self.FMT)
 
