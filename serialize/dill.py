@@ -48,22 +48,11 @@ class MyPickler(dill.Pickler):
     dispatch_table = DispatchTable()
 
 
-class MyUnpickler(dill.Unpickler):
-
-    def load_dict(self):
-        k = self.marker()
-        items = self.stack[k+1:]
-        d = {items[i]: items[i+1]
-             for i in range(0, len(items), 2)}
-        d = all.decode(d)
-        self.stack[k:] = [d]
-
-
 def dump(obj, fp):
     MyPickler(fp).dump(obj)
 
 
 def load(fp):
-    return MyUnpickler(fp).load()
+    return dill.Unpickler(fp).load()
 
 all.register_format('dill', dumper=dump, loader=load)
