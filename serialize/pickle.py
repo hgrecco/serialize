@@ -31,18 +31,18 @@ class DispatchTable(collections.MutableMapping):
                                 (all.CLASSES[item].to_builtin(obj),),
                                 None, None, None)
 
-        return copyreg.dispatch_table[item]
+        return copyreg.dispatch_table[item]     # pragma: no cover
 
-    def __setitem__(self, key, value):
+    def __setitem__(self, key, value):          # pragma: no cover
         copyreg.dispatch_table[key] = value
 
-    def __delitem__(self, key):
+    def __delitem__(self, key):                 # pragma: no cover
         del copyreg.dispatch_table[key]
 
-    def __iter__(self):
+    def __iter__(self):                         # pragma: no cover
         return copyreg.dispatch_table.__iter__()
 
-    def __len__(self):
+    def __len__(self):                          # pragma: no cover
         return copyreg.dispatch_table.__len__()
 
 
