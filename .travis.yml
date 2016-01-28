@@ -8,9 +8,9 @@ install:
     - pip install -r supported_pkgs.txt
     - pip install coveralls
 script:
+  - python -bb -m coverage run -p --source=serialize --omit="*test*" setup.py test
   - coverage combine
   - coverage report -m
-  - python -bb -m coverage run -p --source=serialize --omit="*test*" setup.py test
 
 after_script:
   - coveralls --verbose
