@@ -4,7 +4,8 @@ import os
 from unittest import TestCase, skipIf
 
 from serialize import register_class, loads, dumps, load, dump
-from serialize.all import FORMATS, UNAVAILABLE_FORMATS, _get_format_from_ext
+from serialize.all import (FORMATS, UNAVAILABLE_FORMATS, _get_format_from_ext,
+                           register_format)
 
 
 class X:
@@ -38,6 +39,8 @@ def from_builtin(content):
 
 register_class(X, to_builtin, from_builtin)
 
+register_format('_test')
+
 
 class TestAvailable(TestCase):
 
@@ -45,6 +48,19 @@ class TestAvailable(TestCase):
     def test_available(self):
         self.assertFalse(UNAVAILABLE_FORMATS)
 
+    def test_unknown_format(self):
+        self.assertRaises(ValueError, dumps, 'hello', 'dummy_format')
+        self.assertRaises(ValueError, _get_format_from_ext, 'dummy_format')
+
+    def test_no_replace(self):
+        self.assertRaises(ValueError, register_format, '_test')
+
+    def test_no_dumper_no_loader(self):
+        self.assertRaises(ValueError, dumps, 'hello', '_test')
+        self.assertRaises(ValueError, loads, 'hello', '_test')
+        buf = io.BytesIO()
+        self.assertRaises(ValueError, dump, 'hello', buf, 'test')
+        self.assertRaises(ValueError, load, buf, 'test')
 
 NESTED_DICT = {
         "level1_1": {
@@ -140,12 +156,16 @@ class _TestUnavailable:
 
 
 for key in FORMATS.keys():
-    name = "TestEncoderDecoder_%s" % key
+    if key.startswith('_test'):
+        continue
+    name = "TestEncoderDecoder_%s" % key.replace(':', '_')
     globals()[name] = type(name,
                            (_TestEncoderDecoder, TestCase),
                            dict(FMT=key))
 
 for key in UNAVAILABLE_FORMATS.keys():
+    if key.startswith('_test'):
+        continue
     name = "TestEncoderDecoder_%s" % key
     globals()[name] = type(name,
                            (_TestUnavailable, TestCase),
