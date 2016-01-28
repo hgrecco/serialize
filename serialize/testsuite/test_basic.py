@@ -1,4 +1,5 @@
 
+import io
 import os
 from unittest import TestCase, skipIf
 
@@ -69,7 +70,23 @@ class _TestEncoderDecoder:
     FMT = None
 
     def _test_round_trip(self, obj):
-        self.assertEqual(obj, loads(dumps(obj, self.FMT), self.FMT))
+
+        dumped = dumps(obj, self.FMT)
+
+        # dumps / loads
+        self.assertEqual(obj, loads(dumped, self.FMT))
+
+        buf = io.BytesIO()
+        dump(obj, buf, self.FMT)
+
+        # dump / dumps
+        self.assertEqual(dumped, buf.getvalue())
+
+        buf.seek(0)
+        # dump / load
+        self.assertEqual(obj, load(buf, self.FMT))
+
+
 
     def test_format_from_ext(self):
         if ':' in self.FMT:

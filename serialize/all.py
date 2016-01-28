@@ -18,14 +18,15 @@ from os.path import splitext
 ClassHelper = namedtuple('ClassHelper', 'to_builtin from_builtin')
 
 #: Stores information and function about each format type.
-FormatHelper = namedtuple('Format', 'extension dump dumps load loads')
+Format = namedtuple('Format', 'extension dump dumps load loads')
+UnavailableFormat = namedtuple('UnavailableFormat', 'extension msg')
 
 #: Map unavailable formats to the corresponding error message.
-# :type: str -> str
+# :type: str -> UnavailableFormat
 UNAVAILABLE_FORMATS = {}
 
 #: Map available format names to the corresponding dumper and loader.
-# :type: str -> FormatHelper
+# :type: str -> Format
 FORMATS = {}
 
 #: Map extension to format name.
@@ -260,13 +261,13 @@ def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, e
     if extension is MISSING:
         extension = fmt
 
-    FORMATS[fmt] = FormatHelper(extension, dumper, dumpser, loader, loadser)
+    FORMATS[fmt] = Format(extension, dumper, dumpser, loader, loadser)
 
     if extension:
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
 
 
-def register_unavailable(fmt, msg='', pkg=''):
+def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
     """Register an unavailable serialization format.
 
     Unavailable formats are those known by Serialize but that cannot be used
@@ -276,7 +277,14 @@ def register_unavailable(fmt, msg='', pkg=''):
     if pkg:
         msg = 'This serialization format requires the %s package.' % pkg
 
-    UNAVAILABLE_FORMATS[fmt] = msg
+
+    if extension is MISSING:
+        extension = fmt
+
+    FORMATS[fmt] = UnavailableFormat(extension, msg)
+
+    if extension:
+        FORMAT_BY_EXTENSION[extension.lower()] = fmt
 
 
 def dumps(obj, fmt):
