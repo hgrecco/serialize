@@ -1,0 +1,20 @@
+Serialize Changelog
+===================
+
+
+0.1 (unreleased)
+----------------
+- Initial Release. Implement a generic dump/dumps and load/loads.
+- Added support for registering new serializer/deserializer.
+- Added support for registering custom classes.
+- Format inference for file extension.
+- Added support for bson using https://pypi.python.org/pypi/bson
+- Added support for dill using https://pypi.python.org/pypi/dill
+- Added support for json using https://docs.python.org/3/library/json.html
+- Added support for msgpack using https://pypi.python.org/pypi/msgpack-python
+- Added support for phpserialize using https://pypi.python.org/pypi/phpserialize
+- Added support for pickle using https://docs.python.org/3/library/pickle.html
+- Added support for serpent using https://pypi.python.org/pypi/serpent
+- Added support for yaml using https://pypi.python.org/pypi/pyyaml
+
+
