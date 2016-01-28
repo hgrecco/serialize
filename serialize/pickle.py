@@ -11,6 +11,8 @@
     :license: BSD, see LICENSE for more details.
 """
 
+import collections
+
 from . import all
 
 try:
@@ -21,7 +23,7 @@ except ImportError: # pragma: no cover
     raise
 
 
-class DispatchTable:
+class DispatchTable(collections.MutableMapping):
 
     def __getitem__(self, item):
         if item in all.CLASSES:
@@ -34,13 +36,14 @@ class DispatchTable:
     def __setitem__(self, key, value):
         copyreg.dispatch_table[key] = value
 
-    def get(self, key, default=None):
-        if key in all.CLASSES:
-            return lambda obj: (all.CLASSES[key].from_builtin,
-                                (all.CLASSES[key].to_builtin(obj),),
-                                None, None, None)
+    def __delitem__(self, key):
+        del copyreg.dispatch_table[key]
 
-        return copyreg.dispatch_table.get(key, default)
+    def __iter__(self):
+        return copyreg.dispatch_table.__iter__()
+
+    def __len__(self):
+        return copyreg.dispatch_table.__len__()
 
 
 class MyPickler(pickle.Pickler):

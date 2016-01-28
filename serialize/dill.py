@@ -12,40 +12,17 @@
 """
 
 from . import all
+from . import pickle
 
 try:
     import dill
-    import copyreg
 except ImportError:
     all.register_unavailable('dill', pkg='dill')
     raise
 
-
-class DispatchTable:
-
-    def __getitem__(self, item):
-        if item in all.CLASSES:
-            return lambda obj: (all.CLASSES[item].from_builtin,
-                                (all.CLASSES[item].to_builtin(obj),),
-                                None, None, None)
-
-        return copyreg.dispatch_table[item]
-
-    def __setitem__(self, key, value):
-        copyreg.dispatch_table[key] = value
-
-    def get(self, key, default=None):
-        if key in all.CLASSES:
-            return lambda obj: (all.CLASSES[key].from_builtin,
-                                (all.CLASSES[key].to_builtin(obj),),
-                                None, None, None)
-
-        return copyreg.dispatch_table.get(key, default)
-
-
 class MyPickler(dill.Pickler):
 
-    dispatch_table = DispatchTable()
+    dispatch_table = pickle.DispatchTable()
 
 
 def dump(obj, fp):
