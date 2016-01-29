@@ -1,0 +1,2 @@
+include README AUTHORS CHANGES LICENSE
+recursive-include serialize *.py
