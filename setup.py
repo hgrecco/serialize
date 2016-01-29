@@ -24,7 +24,7 @@ __doc__ = long_description
 
 setup(
     name='Serialize',
-    version='0.1.dev0',
+    version='0.1',
     description='A common API for multiple serialization formats with support for custom classes',
     long_description=long_description,
     keywords='serialization deserialization packing unpacking ',

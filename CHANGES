@@ -2,7 +2,7 @@ Serialize Changelog
 ===================
 
 
-0.1 (unreleased)
+0.1 (2016-01-28)
 ----------------
 - Initial Release. Implement a generic dump/dumps and load/loads.
 - Added support for registering new serializer/deserializer.
