@@ -1,13 +1,13 @@
 # -*- coding: utf-8 -*-
 """
-    serialize.dill
-    ~~~~~~~~~~~~~~
+    serialize.simplejson
+    ~~~~~~~~~~~~~~~~~~~~
 
     Helpers for JSON Serialization.
 
-    See https://docs.python.org/3/library/json.html for more details.
+    See https://github.com/simplejson/simplejson for more details.
 
-    :copyright: (c) 2016 by Hernan E. Grecco.
+    :copyright: (c) 2016 by Hernan E. Grecco, Pieter T. Eendebak
     :license: BSD, see LICENSE for more details.
 """
 
@@ -16,7 +16,7 @@ from . import all
 try:
     import simplejson as json
 except ImportError:  # pragma: no cover
-    all.register_unavailable('json', pkg='json')
+    all.register_unavailable('simplejson', pkg='simplejson')
     raise
 
 
