@@ -22,10 +22,6 @@ except ImportError:  # pragma: no cover
 
 class Encoder(json.JSONEncoder):
 
-    def __init__(self, **kwargs):
-        kwargs['tuple_as_array'] = False
-        super().__init__(**kwargs)
-
     def default(self, obj):
         return all.encode(obj, super().default)
 
