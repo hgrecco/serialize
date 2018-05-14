@@ -15,6 +15,7 @@ from importlib import import_module
 
 _MODULES = ('bson',
             'dill',
+            'simplejson',
             'json',
             'msgpack',
             'phpserialize',
