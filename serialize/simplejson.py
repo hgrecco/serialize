@@ -18,11 +18,12 @@ try:
 except ImportError:  # pragma: no cover
     all.register_unavailable('simplejson', pkg='simplejson')
     raise
-
-
+        
 class Encoder(json.JSONEncoder):
 
     def default(self, obj):
+        if isinstance(obj, tuple):
+            return {'__class_name__': 'tuple', '__fmt__': 'simplejson', '__dumped_obj__':  dumps(list(obj) )}
         return all.encode(obj, super().default)
 
 
