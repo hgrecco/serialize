@@ -149,11 +149,6 @@ def decode(dct, classes_by_name=None):
     if s is None:
         return dct
 
-    # special case to handle nested tuples
-    if s=='tuple':
-        data = loads(dct['__dumped_obj__'].encode('utf-8'), fmt=dct['__fmt__'])
-        return tuple(data)
-
     classes_by_name = classes_by_name or CLASSES_BY_NAME
     try:
         _, from_builtin = classes_by_name[s]
