@@ -31,15 +31,16 @@ class Loader(yaml.Loader):
 
     def construct_object(self, node, deep=False):
 
-        if not isinstance(node, MappingNode):
-            return super().construct_object(node, deep)
+        # It seems that pyyaml is changing the internal structure of the node
+        tmp = super().construct_object(node, deep)
 
-        dct = super().construct_mapping(node, deep)
-        decoded = all.decode(dct)
-        if decoded is not dct:
-            return super().construct_object(node, deep)
+        if isinstance(node, MappingNode):
+            dct = super().construct_mapping(node, deep)
+            decoded = all.decode(dct)
+            if decoded is not dct:
+                return decoded
 
-        return decoded
+        return tmp
 
 
 
