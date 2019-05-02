@@ -28,7 +28,7 @@ without having to learn a new API. Let's now dump it using msgpack:
     >>> loads(_, fmt='msgpack')
     {'answer': 42}
 
-Serialize currently support 8 different formats: `bson`, `dill`, `json`, `msgpack`,
+Serialize currently support 8 different formats: `bson`, `dill`, `json` (builtin or with simplejson package), `msgpack`,
 `phpserialize`, `pickle`, `serpent` and `yaml`. Serialize does not implement these
 formats but rather relies on established, well tested packages. If they are installed,
 serialize will use them.
