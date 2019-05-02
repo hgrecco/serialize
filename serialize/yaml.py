@@ -3,7 +3,7 @@
     serialize.yaml
     ~~~~~~~~~~~~~~
 
-    Helpers for Serpent Serialization.
+    Helpers for YAML Serialization.
 
     See https://pypi.python.org/pypi/pyyaml for more details.
 
