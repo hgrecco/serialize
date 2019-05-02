@@ -35,7 +35,12 @@ class Loader(yaml.Loader):
             return super().construct_object(node, deep)
 
         dct = super().construct_mapping(node, deep)
-        return all.decode(dct)
+        decoded = all.decode(dct)
+        if decoded is not dct:
+            return super().construct_object(node, deep)
+
+        return decoded
+
 
 
 def dumps(obj):
