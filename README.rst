@@ -1,9 +1,10 @@
 Serialize: A common Python API for multiple serialization formats
 =================================================================
 
-There are multiple serialization formats out there ...
+::
 
-                        ... and great packages to use them.
+    There are multiple serialization formats out there ...
+        ... and great packages to use them.
 
 But they all have a different API and switching among them is not so simple
 as it should be. Serialize helps you to do it, including dealing with custom
@@ -32,7 +33,10 @@ Serialize currently support 8 different formats: `bson`, `dill`, `json`, `msgpac
 formats but rather relies on established, well tested packages. If they are installed,
 serialize will use them.
 
+::
+
      ** Serialize allows you to use them all with the same API! **
+
 
 You can also use the `dump` and `load` to write directly to file-like object:
 
