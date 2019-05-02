@@ -5,7 +5,8 @@ Serialize Changelog
 0.2 (unreleased)
 ----------------
 
-- Nothing changed yet.
+- Added support for simplejson package https://pypi.org/project/simplejson/
+- Fixed bug in yaml support.
 
 
 0.1 (2016-01-28)
