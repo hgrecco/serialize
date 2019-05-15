@@ -21,8 +21,14 @@ except ImportError:
     raise
 
 
-# BUGBUG: these are a global namespace, so we need a unique URL/tag to use here...
-SERIALIZED_TAG = 'tag:github.com/hgrecco/serialize,2019:python/serialized-encoded'
+# Note: these tags a global namespace, so we need a unique URL/tag to use here.
+#
+# Pyyaml uses "tag:yaml.org,2002:...", some of which are defined by
+# yaml.org/spec/..., but the python-specific ones (like python/tuple,
+# python/complex, etc) seem to be their own, and probably should have used the
+# hostname pyyaml.org. Serialize's github homepage ought to be a pretty stable
+# URL we can use.
+SERIALIZED_TAG = 'tag:github.com/hgrecco/serialize,2019:python/serialize-encode'
 
 class Dumper(yaml.Dumper):
     def represent_serialized(self, data):
@@ -32,7 +38,7 @@ class Loader(yaml.Loader):
     def construct_serialized(self, node):
         assert node.tag == SERIALIZED_TAG
         assert isinstance(node, MappingNode)
-        dct = self.construct_mapping(node, deep=True) # BUGBUG: appropriate deep value?
+        dct = self.construct_mapping(node, deep=True)
         return all.decode(dct)
 
 
