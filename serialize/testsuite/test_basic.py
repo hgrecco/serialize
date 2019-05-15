@@ -29,7 +29,6 @@ class X:
 
     __repr__ = __str__
 
-
 def to_builtin(obj):
     return obj.a, obj.b
 
@@ -41,6 +40,84 @@ def from_builtin(content):
 register_class(X, to_builtin, from_builtin)
 
 register_format('_test')
+
+#
+# Some classes that exercise various parts of pickle's __reduce__() protocol
+#
+class Reduce_string(object):
+    def __reduce__(self):
+        if self is GLOBAL_X:
+            return "GLOBAL_X"
+        elif self is GLOBAL_Y:
+            return "GLOBAL_Y"
+        else:
+            raise Exception("Unknown Reduce_string()")
+GLOBAL_X = Reduce_string()
+GLOBAL_Y = Reduce_string()
+
+OBJECT_STATE = ('This', 'Is', 2, 'Object', u'State')
+OBJECT_MEMBERS = ('These', 'are', ('object', 'members'))
+class Reduce_x(dict):
+    def __init__(self, *args, **kwargs):
+        try:
+            super(Reduce_x, self).__init__(*args, **kwargs)
+        except:
+            raise Exception(repr(args))
+        self.__dict__ = self
+
+    def extend(self, *args):
+        assert tuple(*args) == OBJECT_MEMBERS
+
+    def __setstate__(self, state):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        assert state == OBJECT_STATE
+
+    def _getstate(self):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        return OBJECT_STATE
+
+    def __setitem__(self, key, value):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        if key in self:
+            assert self[key] == value
+        super(Reduce_x, self).__setitem__(key, value)
+
+    def _initargs(self):
+        args = list(zip(self.keys(), self.values()))
+        return (args,)
+
+class Reduce_2(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs())
+
+class Reduce_3(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs(),
+            self._getstate())
+
+class Reduce_4(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs(),
+            self._getstate(),
+            iter(OBJECT_MEMBERS))
+
+class Reduce_5(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs(),
+            self._getstate(),
+            iter(OBJECT_MEMBERS),
+            zip(self.keys(), self.values()))
 
 
 class TestAvailable(TestCase):
@@ -153,6 +230,37 @@ class _TestEncoderDecoder:
 
     def test_nest_type(self):
         self._test_round_trip(NESTED_DICT)
+
+    def test_reduce_string(self):
+        # Most formats don't support this (pickle does)
+        if self.FMT in [
+                        'yaml:legacy',
+                        'json',
+                        'serpent',
+                        'phpserialize',
+                        'msgpack',
+                        'json:pretty',
+                        'bson',
+                        'yaml' # https://github.com/yaml/pyyaml/issues/300
+                        ]:
+            return
+        self._test_round_trip(GLOBAL_X)
+        self._test_round_trip(GLOBAL_Y)
+
+    def test_reduce(self):
+        # yaml:legacy exists because it did not handle these case, so skip these tests
+        if self.FMT == 'yaml:legacy':
+            return
+        classes = [Reduce_2, Reduce_3, Reduce_4, Reduce_5]
+        for clsa in classes:
+            a = clsa(a=1,b=2,c=dict(d=3,e=4))
+            self._test_round_trip(a)
+
+            for clsb in classes:
+                b = clsb(f=8,g=9,h=dict(i=9,j=10))
+                a['B'] = b
+                self._test_round_trip(b)
+
 
     def test_custom_object(self):
 
