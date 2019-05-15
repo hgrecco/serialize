@@ -3,7 +3,9 @@
     serialize.yaml
     ~~~~~~~~~~~~~~
 
-    Helpers for Serpent Serialization.
+    Helpers for YAML (legacy) Serialization.
+
+    This format is compatible with the 'yaml' format from version 0.1 of serialize.yaml.
 
     See https://pypi.python.org/pypi/pyyaml for more details.
 
@@ -17,7 +19,7 @@ try:
     import yaml
     from yaml.constructor import MappingNode
 except ImportError:
-    all.register_unavailable('yaml', pkg='pyyaml')
+    all.register_unavailable('yaml:legacy', pkg='pyyaml')
     raise
 
 
@@ -46,5 +48,4 @@ def loads(content):
     return yaml.load(content.decode('utf-8'),
                      Loader=Loader)
 
-all.register_format('yaml', dumps, loads)
-
+all.register_format('yaml:legacy', dumps, loads)

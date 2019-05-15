@@ -20,7 +20,8 @@ _MODULES = ('bson',
             'phpserialize',
             'pickle',
             'serpent',
-            'yaml')
+            'yaml',
+            'yaml_legacy')
 
 for name in _MODULES:
     try:
