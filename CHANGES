@@ -6,7 +6,8 @@ Serialize Changelog
 ----------------
 
 - Added support for simplejson package https://pypi.org/project/simplejson/
-- Fixed bug in yaml support.
+- Change yaml support to support objects using __reduce__
+- Renamed the existing 'yaml' format to 'yaml:legacy'
 
 
 0.1 (2016-01-28)
