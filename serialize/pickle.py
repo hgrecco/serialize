@@ -11,7 +11,7 @@
     :license: BSD, see LICENSE for more details.
 """
 
-import collections
+from collections.abc import MutableMapping
 
 from . import all
 
@@ -23,7 +23,7 @@ except ImportError: # pragma: no cover
     raise
 
 
-class DispatchTable(collections.MutableMapping):
+class DispatchTable(MutableMapping):
 
     def __getitem__(self, item):
         if item in all.CLASSES:
