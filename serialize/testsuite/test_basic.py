@@ -1,6 +1,7 @@
 
 import io
 import os
+from pathlib import Path
 from unittest import TestCase, skipIf
 
 from serialize import register_class, loads, dumps, load, dump
@@ -122,6 +123,14 @@ class _TestEncoderDecoder:
             self.assertEqual(obj, obj2)
         finally:
             os.remove(filename2)
+
+        filename3 = Path("tmp." + fh.extension)
+        dump(obj, filename3)
+        try:
+            obj1 = load(filename3)
+            self.assertEqual(obj, obj1)
+        finally:
+            filename3.unlink()
 
     def test_format_from_ext(self):
         if ':' in self.FMT:
