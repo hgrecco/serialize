@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      TEST_OPTS: "-rfsxEX -s --cov=mdform --cov-config=.coveragerc"
+      TEST_OPTS: "-rfsxEX -s --cov=serialize --cov-config=.coveragerc"
 
     steps:
       - uses: actions/checkout@v2
