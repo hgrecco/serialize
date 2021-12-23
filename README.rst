@@ -1,3 +1,29 @@
+.. image:: https://img.shields.io/pypi/v/serialize.svg
+    :target: https://pypi.python.org/pypi/serialize
+    :alt: Latest Version
+
+.. image:: https://img.shields.io/pypi/l/serialize.svg
+    :target: https://pypi.python.org/pypi/serialize
+    :alt: License
+
+.. image:: https://img.shields.io/pypi/pyversions/serialize.svg
+    :target: https://pypi.python.org/pypi/serialize
+    :alt: Python Versions
+
+.. image:: https://github.com/hgrecco/serialize/workflows/CI/badge.svg
+    :target: https://github.com/hgrecco/serialize/actions?query=workflow%3ACI
+    :alt: CI
+
+.. image:: https://github.com/hgrecco/serialize/workflows/Lint/badge.svg
+    :target: https://github.com/hgrecco/serialize/actions?query=workflow%3ALint
+    :alt: LINTER
+
+
+.. image:: https://coveralls.io/repos/github/hgrecco/serialize/badge.svg?branch=master
+    :target: https://coveralls.io/github/hgrecco/serialize?branch=master
+    :alt: Coverage
+
+
 Serialize: A common Python API for multiple serialization formats
 =================================================================
 
