@@ -1,6 +1,7 @@
 import io
 import os
-from unittest import TestCase, skipIf
+
+import pytest
 
 from serialize import dump, dumps, load, loads, register_class
 from serialize.all import (
@@ -42,27 +43,18 @@ def from_builtin(content):
 
 register_class(X, to_builtin, from_builtin)
 
-register_format("_test")
+
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_available(fmt):
+    assert fmt not in UNAVAILABLE_FORMATS
 
 
-class TestAvailable(TestCase):
-    @skipIf(os.environ.get("EXTRAS", None) == "N", "Extras not installed")
-    def test_available(self):
-        self.assertFalse(UNAVAILABLE_FORMATS)
+def test_unknown_format():
+    with pytest.raises(ValueError):
+        _get_format_from_ext("dummy_format")
 
-    def test_unknown_format(self):
-        self.assertRaises(ValueError, dumps, "hello", "dummy_format")
-        self.assertRaises(ValueError, _get_format_from_ext, "dummy_format")
-
-    def test_no_replace(self):
-        self.assertRaises(ValueError, register_format, "_test")
-
-    def test_no_dumper_no_loader(self):
-        self.assertRaises(ValueError, dumps, "hello", "_test")
-        self.assertRaises(ValueError, loads, "hello", "_test")
-        buf = io.BytesIO()
-        self.assertRaises(ValueError, dump, "hello", buf, "test")
-        self.assertRaises(ValueError, load, buf, "test")
+    with pytest.raises(ValueError):
+        dumps("hello", "dummy_format")
 
 
 NESTED_DICT = {
@@ -75,105 +67,108 @@ NESTED_DICT = {
 }
 
 
-class _TestEncoderDecoder:
+VALUES = [
+    "hello",
+    1,
+    1.2,
+    None,
+    True,
+    False,
+    dict(),
+    dict(x=1, y=2, z=3),
+    [],
+    [1, 2, 3],
+    NESTED_DICT,
+    X(3, 4),
+    dict(a=X(3, 4), b=X(1, 2), d=[X(0, 1), X(2, 3)]),
+]
 
-    FMT = None
 
-    def _test_round_trip(self, obj):
+@pytest.mark.parametrize("obj", VALUES)
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_round_trip(obj, fmt):
+    if fmt == "_test":
+        return
+    dumped = dumps(obj, fmt)
 
-        dumped = dumps(obj, self.FMT)
+    # dumps / loads
+    assert obj == loads(dumped, fmt)
 
-        # dumps / loads
-        self.assertEqual(obj, loads(dumped, self.FMT))
+    buf = io.BytesIO()
+    dump(obj, buf, fmt)
 
-        buf = io.BytesIO()
-        dump(obj, buf, self.FMT)
+    # dump / dumps
+    assert dumped == buf.getvalue()
 
-        # dump / dumps
-        self.assertEqual(dumped, buf.getvalue())
+    buf.seek(0)
+    # dump / load
+    assert obj == load(buf, fmt)
 
-        buf.seek(0)
-        # dump / load
-        self.assertEqual(obj, load(buf, self.FMT))
 
-    def test_file_by_name(self):
-        fh = _get_format(self.FMT)
-        obj = dict(answer=42)
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_file_by_name(fmt):
+    if fmt == "_test":
+        return
+    fh = _get_format(fmt)
+    obj = dict(answer=42)
 
-        filename1 = "tmp." + fh.extension
+    filename1 = "tmp." + fh.extension
+
+    try:
         dump(obj, filename1)
-        try:
-            obj1 = load(filename1)
-            self.assertEqual(obj, obj1)
-        finally:
-            os.remove(filename1)
+        obj1 = load(filename1)
+        assert obj == obj1
+    finally:
+        os.remove(filename1)
 
-        filename2 = "tmp." + fh.extension + ".bla"
-        dump(obj, filename2, fmt=self.FMT)
-        try:
-            obj2 = load(filename2, fmt=self.FMT)
-            self.assertEqual(obj, obj2)
-        finally:
-            os.remove(filename2)
+    filename2 = "tmp." + fh.extension + ".bla"
 
-    def test_format_from_ext(self):
-        if ":" in self.FMT:
-            return
-        fh = FORMATS[self.FMT]
-        self.assertEqual(_get_format_from_ext(fh.extension), self.FMT)
-
-    def test_response_bytes(self):
-
-        obj = "here I am"
-
-        self.assertIsInstance(dumps(obj, self.FMT), bytes)
-
-    def test_simple_types(self):
-        self._test_round_trip("hello")
-        self._test_round_trip(1)
-        self._test_round_trip(1.1)
-        self._test_round_trip(None)
-        self._test_round_trip(True)
-        self._test_round_trip(False)
-
-    def test_dict(self):
-        self._test_round_trip(dict())
-        self._test_round_trip(dict(x=1, y=2, z=3))
-
-    def test_list(self):
-        self._test_round_trip([])
-        self._test_round_trip([1, 2, 3])
-
-    def test_nest_type(self):
-        self._test_round_trip(NESTED_DICT)
-
-    def test_custom_object(self):
-
-        c = X(3, 4)
-        self._test_round_trip(c)
-
-    def test_custom_object_in_container(self):
-
-        c = dict(a=X(3, 4), b=X(1, 2), d=[X(0, 1), X(2, 3)])
-        self._test_round_trip(c)
+    try:
+        dump(obj, filename2, fmt=fmt)
+        obj2 = load(filename2, fmt=fmt)
+        assert obj == obj2
+    finally:
+        os.remove(filename2)
 
 
-class _TestUnavailable:
-    def test_raise(self):
-        self.assertRaises(ValueError, dumps, "hello", self.FMT)
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_format_from_ext(fmt):
+    if fmt == "_test":
+        return
+    if ":" in fmt:
+        return
+    fh = FORMATS[fmt]
+    assert _get_format_from_ext(fh.extension) == fmt
 
-    def test_raise_from_ext(self):
-        self.assertRaises(ValueError, dumps, "hello", self.FMT)
+
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_response_bytes(fmt):
+    if fmt == "_test":
+        return
+    obj = "here I am"
+
+    assert isinstance(dumps(obj, fmt), bytes)
 
 
-for key in FORMATS.keys():
-    if key.startswith("_test"):
-        continue
-    name = "TestEncoderDecoder_%s" % key.replace(":", "_")
-    globals()[name] = type(name, (_TestEncoderDecoder, TestCase), dict(FMT=key))
+register_format("_test")
 
-for key in UNAVAILABLE_FORMATS.keys():
-    if key.startswith("_test"):
-        continue
-    name = "TestEncoderDecoder_%s" % key
-    globals()[name] = type(name, (_TestUnavailable, TestCase), dict(FMT=key))
+
+def test_no_replace():
+    with pytest.raises(ValueError):
+        register_format("_test")
+
+
+def test_no_dumper_no_loader():
+    with pytest.raises(ValueError):
+        dumps("hello", "_test")
+
+    with pytest.raises(ValueError):
+        loads("hello", "_test")
+
+    buf = io.BytesIO()
+    with pytest.raises(ValueError):
+        dump("hello", buf, "test")
+
+    buf = io.BytesIO()
+    with pytest.raises(ValueError):
+        load(buf, "test")

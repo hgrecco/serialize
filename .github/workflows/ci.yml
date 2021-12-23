@@ -42,7 +42,7 @@ jobs:
         run: |
           pip install .[test]
           pip install -r supported_pkgs.txt
-          
+
       - name: Run Tests
         run: |
           pytest $TEST_OPTS
