@@ -25,7 +25,7 @@ def dumps(obj):
 
 
 def loads(content):
-    return msgpack.unpackb(content, object_hook=all.decode, encoding="utf-8")
+    return msgpack.unpackb(content, object_hook=all.decode, raw=False)
 
 
 all.register_format("msgpack", dumps, loads)
