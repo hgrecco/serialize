@@ -7,6 +7,7 @@ jobs:
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8, 3.9, '3.10']
+        extras: [true, false]
 
     runs-on: ubuntu-latest
 
@@ -41,7 +42,10 @@ jobs:
       - name: Install dependencies
         run: |
           pip install .[test]
-          pip install -r supported_pkgs.txt
+
+      - name: Install extras
+        if: ${{ matrix.extras != false }}
+        run: pip install -r supported_pkgs.txt
 
       - name: Run Tests
         run: |
