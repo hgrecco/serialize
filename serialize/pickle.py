@@ -16,33 +16,36 @@ import collections
 from . import all
 
 try:
-    import pickle
     import copyreg
-except ImportError: # pragma: no cover
-    all.register_unavailable('pickle', pkg='pickle')
+    import pickle
+except ImportError:  # pragma: no cover
+    all.register_unavailable("pickle", pkg="pickle")
     raise
 
 
 class DispatchTable(collections.MutableMapping):
-
     def __getitem__(self, item):
         if item in all.CLASSES:
-            return lambda obj: (all.CLASSES[item].from_builtin,
-                                (all.CLASSES[item].to_builtin(obj),),
-                                None, None, None)
+            return lambda obj: (
+                all.CLASSES[item].from_builtin,
+                (all.CLASSES[item].to_builtin(obj),),
+                None,
+                None,
+                None,
+            )
 
-        return copyreg.dispatch_table[item]     # pragma: no cover
+        return copyreg.dispatch_table[item]  # pragma: no cover
 
-    def __setitem__(self, key, value):          # pragma: no cover
+    def __setitem__(self, key, value):  # pragma: no cover
         copyreg.dispatch_table[key] = value
 
-    def __delitem__(self, key):                 # pragma: no cover
+    def __delitem__(self, key):  # pragma: no cover
         del copyreg.dispatch_table[key]
 
-    def __iter__(self):                         # pragma: no cover
+    def __iter__(self):  # pragma: no cover
         return copyreg.dispatch_table.__iter__()
 
-    def __len__(self):                          # pragma: no cover
+    def __len__(self):  # pragma: no cover
         return copyreg.dispatch_table.__len__()
 
 
@@ -58,4 +61,5 @@ def dump(obj, fp):
 def load(fp):
     return pickle.Unpickler(fp).load()
 
-all.register_format('pickle', dumper=dump, loader=load)
+
+all.register_format("pickle", dumper=dump, loader=load)

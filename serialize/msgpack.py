@@ -16,7 +16,7 @@ from . import all
 try:
     import msgpack
 except ImportError:
-    all.register_unavailable('msgpack', pkg='msgpack-python')
+    all.register_unavailable("msgpack", pkg="msgpack-python")
     raise
 
 
@@ -25,6 +25,7 @@ def dumps(obj):
 
 
 def loads(content):
-    return msgpack.unpackb(content, object_hook=all.decode, encoding='utf-8')
+    return msgpack.unpackb(content, object_hook=all.decode, encoding="utf-8")
 
-all.register_format('msgpack', dumps, loads)
+
+all.register_format("msgpack", dumps, loads)

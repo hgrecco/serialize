@@ -1,22 +1,24 @@
-
 import io
 import os
 from unittest import TestCase, skipIf
 
-from serialize import register_class, loads, dumps, load, dump
-from serialize.all import (FORMATS, UNAVAILABLE_FORMATS,
-                           _get_format_from_ext, _get_format,
-                           register_format)
+from serialize import dump, dumps, load, loads, register_class
+from serialize.all import (
+    FORMATS,
+    UNAVAILABLE_FORMATS,
+    _get_format,
+    _get_format_from_ext,
+    register_format,
+)
 
 
 class X:
-
     def __init__(self, a, b):
         self.a = a
         self.b = b
 
     def __eq__(self, other):
-        if not self.__class__ is other.__class__:
+        if self.__class__ is not other.__class__:
             return False
         if self.a != other.a:
             return False
@@ -25,7 +27,7 @@ class X:
         return True
 
     def __str__(self):
-        return 'X(%s, %s)' % (self.a, self.b)
+        return "X(%s, %s)" % (self.a, self.b)
 
     __repr__ = __str__
 
@@ -40,46 +42,37 @@ def from_builtin(content):
 
 register_class(X, to_builtin, from_builtin)
 
-register_format('_test')
+register_format("_test")
 
 
 class TestAvailable(TestCase):
-
-    @skipIf(os.environ.get('EXTRAS', None) == 'N', 'Extras not installed')
+    @skipIf(os.environ.get("EXTRAS", None) == "N", "Extras not installed")
     def test_available(self):
         self.assertFalse(UNAVAILABLE_FORMATS)
 
     def test_unknown_format(self):
-        self.assertRaises(ValueError, dumps, 'hello', 'dummy_format')
-        self.assertRaises(ValueError, _get_format_from_ext, 'dummy_format')
+        self.assertRaises(ValueError, dumps, "hello", "dummy_format")
+        self.assertRaises(ValueError, _get_format_from_ext, "dummy_format")
 
     def test_no_replace(self):
-        self.assertRaises(ValueError, register_format, '_test')
+        self.assertRaises(ValueError, register_format, "_test")
 
     def test_no_dumper_no_loader(self):
-        self.assertRaises(ValueError, dumps, 'hello', '_test')
-        self.assertRaises(ValueError, loads, 'hello', '_test')
+        self.assertRaises(ValueError, dumps, "hello", "_test")
+        self.assertRaises(ValueError, loads, "hello", "_test")
         buf = io.BytesIO()
-        self.assertRaises(ValueError, dump, 'hello', buf, 'test')
-        self.assertRaises(ValueError, load, buf, 'test')
+        self.assertRaises(ValueError, dump, "hello", buf, "test")
+        self.assertRaises(ValueError, load, buf, "test")
+
 
 NESTED_DICT = {
-        "level1_1": {
-            "level2_1": [1, 2, 3],
-            "level2_2": [4, 5, 6]
-        },
-        "level1_2": {
-            "level2_1": [1, 2, 3],
-            "level2_2": [4, 5, 6]
-        },
-        "level1_3": {
-            "level2_1": {
-                "level3_1": [1, 2, 3],
-                "level3_2": [4, 5, 6]
-            },
-            "level2_2": [4, 5, 6]
-        }
-    }
+    "level1_1": {"level2_1": [1, 2, 3], "level2_2": [4, 5, 6]},
+    "level1_2": {"level2_1": [1, 2, 3], "level2_2": [4, 5, 6]},
+    "level1_3": {
+        "level2_1": {"level3_1": [1, 2, 3], "level3_2": [4, 5, 6]},
+        "level2_2": [4, 5, 6],
+    },
+}
 
 
 class _TestEncoderDecoder:
@@ -107,7 +100,7 @@ class _TestEncoderDecoder:
         fh = _get_format(self.FMT)
         obj = dict(answer=42)
 
-        filename1 = 'tmp.' + fh.extension
+        filename1 = "tmp." + fh.extension
         dump(obj, filename1)
         try:
             obj1 = load(filename1)
@@ -115,7 +108,7 @@ class _TestEncoderDecoder:
         finally:
             os.remove(filename1)
 
-        filename2 = 'tmp.' + fh.extension + '.bla'
+        filename2 = "tmp." + fh.extension + ".bla"
         dump(obj, filename2, fmt=self.FMT)
         try:
             obj2 = load(filename2, fmt=self.FMT)
@@ -124,19 +117,19 @@ class _TestEncoderDecoder:
             os.remove(filename2)
 
     def test_format_from_ext(self):
-        if ':' in self.FMT:
+        if ":" in self.FMT:
             return
         fh = FORMATS[self.FMT]
         self.assertEqual(_get_format_from_ext(fh.extension), self.FMT)
 
     def test_response_bytes(self):
 
-        obj = 'here I am'
+        obj = "here I am"
 
         self.assertIsInstance(dumps(obj, self.FMT), bytes)
 
     def test_simple_types(self):
-        self._test_round_trip('hello')
+        self._test_round_trip("hello")
         self._test_round_trip(1)
         self._test_round_trip(1.1)
         self._test_round_trip(None)
@@ -166,26 +159,21 @@ class _TestEncoderDecoder:
 
 
 class _TestUnavailable:
-
     def test_raise(self):
-        self.assertRaises(ValueError, dumps, 'hello', self.FMT)
+        self.assertRaises(ValueError, dumps, "hello", self.FMT)
 
     def test_raise_from_ext(self):
-        self.assertRaises(ValueError, dumps, 'hello', self.FMT)
+        self.assertRaises(ValueError, dumps, "hello", self.FMT)
 
 
 for key in FORMATS.keys():
-    if key.startswith('_test'):
+    if key.startswith("_test"):
         continue
-    name = "TestEncoderDecoder_%s" % key.replace(':', '_')
-    globals()[name] = type(name,
-                           (_TestEncoderDecoder, TestCase),
-                           dict(FMT=key))
+    name = "TestEncoderDecoder_%s" % key.replace(":", "_")
+    globals()[name] = type(name, (_TestEncoderDecoder, TestCase), dict(FMT=key))
 
 for key in UNAVAILABLE_FORMATS.keys():
-    if key.startswith('_test'):
+    if key.startswith("_test"):
         continue
     name = "TestEncoderDecoder_%s" % key
-    globals()[name] = type(name,
-                           (_TestUnavailable, TestCase),
-                           dict(FMT=key))
+    globals()[name] = type(name, (_TestUnavailable, TestCase), dict(FMT=key))

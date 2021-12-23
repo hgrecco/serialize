@@ -11,14 +11,14 @@
     :license: BSD, see LICENSE for more details.
 """
 
-from . import all
-from . import pickle
+from . import all, pickle
 
 try:
     import dill
 except ImportError:
-    all.register_unavailable('dill', pkg='dill')
+    all.register_unavailable("dill", pkg="dill")
     raise
+
 
 class MyPickler(dill.Pickler):
 
@@ -32,4 +32,5 @@ def dump(obj, fp):
 def load(fp):
     return dill.Unpickler(fp).load()
 
-all.register_format('dill', dumper=dump, loader=load)
+
+all.register_format("dill", dumper=dump, loader=load)

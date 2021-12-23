@@ -15,11 +15,11 @@ from io import BytesIO
 from os.path import splitext
 
 #: Stores the functions to convert custom classes to and from builtin types.
-ClassHelper = namedtuple('ClassHelper', 'to_builtin from_builtin')
+ClassHelper = namedtuple("ClassHelper", "to_builtin from_builtin")
 
 #: Stores information and function about each format type.
-Format = namedtuple('Format', 'extension dump dumps load loads')
-UnavailableFormat = namedtuple('UnavailableFormat', 'extension msg')
+Format = namedtuple("Format", "extension dump dumps load loads")
+UnavailableFormat = namedtuple("UnavailableFormat", "extension msg")
 
 #: Map unavailable formats to the corresponding error message.
 # :type: str -> UnavailableFormat
@@ -52,9 +52,14 @@ def _get_format(fmt):
         return FORMATS[fmt]
 
     if fmt in UNAVAILABLE_FORMATS:
-        raise ValueError(("'%s' is an unavailable format. " % fmt) + UNAVAILABLE_FORMATS[fmt].msg)
+        raise ValueError(
+            ("'%s' is an unavailable format. " % fmt) + UNAVAILABLE_FORMATS[fmt].msg
+        )
 
-    raise ValueError("'%s' is an unknown format. Valid options are %s" % (fmt, ', '.join(FORMATS.keys())))
+    raise ValueError(
+        "'%s' is an unknown format. Valid options are %s"
+        % (fmt, ", ".join(FORMATS.keys()))
+    )
 
 
 def _get_format_from_ext(ext):
@@ -67,10 +72,11 @@ def _get_format_from_ext(ext):
     if ext in FORMAT_BY_EXTENSION:
         return FORMAT_BY_EXTENSION[ext]
 
-    valid = ', '.join(FORMAT_BY_EXTENSION.keys())
+    valid = ", ".join(FORMAT_BY_EXTENSION.keys())
 
-    raise ValueError("'%s' is an unknown extension. "
-                     "Valid options are %s" % (ext, valid))
+    raise ValueError(
+        "'%s' is an unknown extension. " "Valid options are %s" % (ext, valid)
+    )
 
 
 def encode_helper(obj, to_builtin):
@@ -78,8 +84,7 @@ def encode_helper(obj, to_builtin):
     that can convert it to a builtin data type.
     """
 
-    return dict(__class_name__= str(obj.__class__),
-                __dumped_obj__=to_builtin(obj))
+    return dict(__class_name__=str(obj.__class__), __dumped_obj__=to_builtin(obj))
 
 
 def encode(obj, defaultfunc=None):
@@ -98,8 +103,10 @@ def encode(obj, defaultfunc=None):
 
 
 def _traverse_dict_ec(obj, ef, td):
-    return {traverse_and_encode(k, ef, td): traverse_and_encode(v, ef, td)
-            for k, v in obj.items()}
+    return {
+        traverse_and_encode(k, ef, td): traverse_and_encode(v, ef, td)
+        for k, v in obj.items()
+    }
 
 
 def _traverse_list_ec(obj, ef, td):
@@ -145,14 +152,14 @@ def decode(dct, classes_by_name=None):
     if not isinstance(dct, dict):
         return dct
 
-    s = dct.get('__class_name__', None)
+    s = dct.get("__class_name__", None)
     if s is None:
         return dct
 
     classes_by_name = classes_by_name or CLASSES_BY_NAME
     try:
         _, from_builtin = classes_by_name[s]
-        c = dct['__dumped_obj__']
+        c = dct["__dumped_obj__"]
     except KeyError:
         return dct
 
@@ -160,14 +167,18 @@ def decode(dct, classes_by_name=None):
 
 
 def _traverse_dict_dc(obj, df, td):
-    if '__class_name__' in obj:
+    if "__class_name__" in obj:
         return df(obj)
 
-    return {traverse_and_decode(k, df, td): traverse_and_decode(v, df, td)
-            for k, v in obj.items()}
+    return {
+        traverse_and_decode(k, df, td): traverse_and_decode(v, df, td)
+        for k, v in obj.items()
+    }
+
 
 def _traverse_list_dc(obj, df, td):
     return [traverse_and_decode(el, df, td) for el in obj]
+
 
 def _traverse_tuple_dc(obj, df, td):
     return tuple(traverse_and_decode(el, df, td) for el in obj)
@@ -203,7 +214,9 @@ def traverse_and_decode(obj, decode_func=None, trav_dict=None):
 MISSING = object()
 
 
-def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, extension=MISSING):
+def register_format(
+    fmt, dumpser=None, loadser=None, dumper=None, loader=None, extension=MISSING
+):
     """Register an available serialization format.
 
     `fmt` is a unique string identifying the format, such as `json`. Use a colon (`:`) to
@@ -228,38 +241,44 @@ def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, e
 
     # Here we generate dumper/dumpser if they are not present.
     if dumper and not dumpser:
+
         def dumpser(obj):
             buf = BytesIO()
             dumper(obj, buf)
             return buf.getvalue()
 
     elif not dumper and dumpser:
+
         def dumper(obj, fp):
             fp.write(dumpser(obj))
 
     elif not dumper and not dumpser:
+
         def raiser(*args, **kwargs):
-            raise ValueError('dump/dumps is not defined for %s' % fmt)
+            raise ValueError("dump/dumps is not defined for %s" % fmt)
 
         dumper = dumpser = raiser
 
     # Here we generate loader/loadser if they are not present.
     if loader and not loadser:
+
         def loadser(serialized):
             return loader(BytesIO(serialized))
 
     elif not loader and loadser:
+
         def loader(fp):
             return loadser(fp.read())
 
     elif not loader and not loadser:
+
         def raiser(*args, **kwargs):
-            raise ValueError('load/loads is not defined for %s' % fmt)
+            raise ValueError("load/loads is not defined for %s" % fmt)
 
         loader = loadser = raiser
 
     if extension is MISSING:
-        extension = fmt.split(':', 1)[0]
+        extension = fmt.split(":", 1)[0]
 
     FORMATS[fmt] = Format(extension, dumper, dumpser, loader, loadser)
 
@@ -267,7 +286,7 @@ def register_format(fmt, dumpser=None, loadser=None, dumper=None, loader=None, e
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
 
 
-def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
+def register_unavailable(fmt, msg="", pkg="", extension=MISSING):
     """Register an unavailable serialization format.
 
     Unavailable formats are those known by Serialize but that cannot be used
@@ -275,10 +294,10 @@ def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
 
     """
     if pkg:
-        msg = 'This serialization format requires the %s package.' % pkg
+        msg = "This serialization format requires the %s package." % pkg
 
     if extension is MISSING:
-        extension = fmt.split(':', 1)[0]
+        extension = fmt.split(":", 1)[0]
 
     UNAVAILABLE_FORMATS[fmt] = UnavailableFormat(extension, msg)
 
@@ -287,8 +306,7 @@ def register_unavailable(fmt, msg='', pkg='', extension=MISSING):
 
 
 def dumps(obj, fmt):
-    """Serialize `obj` to bytes using the format specified by `fmt`
-    """
+    """Serialize `obj` to bytes using the format specified by `fmt`"""
 
     return _get_format(fmt).dumps(obj)
 
@@ -303,16 +321,15 @@ def dump(obj, filename_or_file, fmt=None):
     if isinstance(filename_or_file, str):
         if fmt is None:
             _, ext = splitext(filename_or_file)
-            fmt = _get_format_from_ext(ext.strip('.'))
-        with open(filename_or_file, 'wb') as fp:
+            fmt = _get_format_from_ext(ext.strip("."))
+        with open(filename_or_file, "wb") as fp:
             dump(obj, fp, fmt)
     else:
         _get_format(fmt).dump(obj, filename_or_file)
 
 
 def loads(serialized, fmt):
-    """Deserialize bytes using the format specified by `fmt`
-    """
+    """Deserialize bytes using the format specified by `fmt`"""
 
     return _get_format(fmt).loads(serialized)
 
@@ -327,8 +344,8 @@ def load(filename_or_file, fmt=None):
     if isinstance(filename_or_file, str):
         if fmt is None:
             _, ext = splitext(filename_or_file)
-            fmt = _get_format_from_ext(ext.strip('.'))
-        with open(filename_or_file, 'rb') as fp:
+            fmt = _get_format_from_ext(ext.strip("."))
+        with open(filename_or_file, "rb") as fp:
             return load(fp, fmt)
 
     return _get_format(fmt).load(filename_or_file)
