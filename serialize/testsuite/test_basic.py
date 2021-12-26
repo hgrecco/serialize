@@ -1,5 +1,6 @@
 import io
 import os
+import pathlib
 
 import pytest
 
@@ -129,6 +130,33 @@ def test_file_by_name(fmt):
         assert obj == obj2
     finally:
         os.remove(filename2)
+
+
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_file_by_name_pathlib(fmt):
+    if fmt == "_test":
+        return
+    fh = _get_format(fmt)
+    obj = dict(answer=42)
+
+    filename1 = "tmp." + fh.extension
+    filename1 = pathlib.Path(filename1)
+
+    try:
+        dump(obj, filename1)
+        obj1 = load(filename1)
+        assert obj == obj1
+    finally:
+        filename1.unlink()
+
+    filename2 = "tmp." + fh.extension + ".bla"
+    filename2 = pathlib.Path(filename2)
+    try:
+        dump(obj, filename2, fmt=fmt)
+        obj2 = load(filename2, fmt=fmt)
+        assert obj == obj2
+    finally:
+        filename2.unlink()
 
 
 @pytest.mark.parametrize("fmt", FORMATS)

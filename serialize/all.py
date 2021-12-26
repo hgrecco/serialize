@@ -10,9 +10,9 @@
 """
 
 
+import pathlib
 from collections import namedtuple
 from io import BytesIO
-from os.path import splitext
 
 #: Stores the functions to convert custom classes to and from builtin types.
 ClassHelper = namedtuple("ClassHelper", "to_builtin from_builtin")
@@ -311,21 +311,22 @@ def dumps(obj, fmt):
     return _get_format(fmt).dumps(obj)
 
 
-def dump(obj, filename_or_file, fmt=None):
+def dump(obj, file, fmt=None):
     """Serialize `obj` to a file using the format specified by `fmt`
 
     The file can be specified by a file-like object or filename.
     In the latter case the fmt is not need if it can be guessed from the extension.
     """
+    if isinstance(file, str):
+        file = pathlib.Path(file)
 
-    if isinstance(filename_or_file, str):
+    if isinstance(file, pathlib.Path):
         if fmt is None:
-            _, ext = splitext(filename_or_file)
-            fmt = _get_format_from_ext(ext.strip("."))
-        with open(filename_or_file, "wb") as fp:
+            fmt = _get_format_from_ext(file.suffix.lstrip("."))
+        with file.open(mode="wb") as fp:
             dump(obj, fp, fmt)
     else:
-        _get_format(fmt).dump(obj, filename_or_file)
+        _get_format(fmt).dump(obj, file)
 
 
 def loads(serialized, fmt):
@@ -334,21 +335,22 @@ def loads(serialized, fmt):
     return _get_format(fmt).loads(serialized)
 
 
-def load(filename_or_file, fmt=None):
+def load(file, fmt=None):
     """Deserialize from a file using the format specified by `fmt`
 
     The file can be specified by a file-like object or filename.
     In the latter case the fmt is not need if it can be guessed from the extension.
     """
+    if isinstance(file, str):
+        file = pathlib.Path(file)
 
-    if isinstance(filename_or_file, str):
+    if isinstance(file, pathlib.Path):
         if fmt is None:
-            _, ext = splitext(filename_or_file)
-            fmt = _get_format_from_ext(ext.strip("."))
-        with open(filename_or_file, "rb") as fp:
+            fmt = _get_format_from_ext(file.suffix.lstrip("."))
+        with file.open(mode="rb") as fp:
             return load(fp, fmt)
 
-    return _get_format(fmt).load(filename_or_file)
+    return _get_format(fmt).load(file)
 
 
 def register_class(klass, to_builtin, from_builtin):
