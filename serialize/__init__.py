@@ -22,6 +22,7 @@ _MODULES = (
     "pickle",
     "serpent",
     "yaml",
+    "yaml_legacy",
 )
 
 for name in _MODULES:

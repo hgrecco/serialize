@@ -85,11 +85,7 @@ VALUES = [
 ]
 
 
-@pytest.mark.parametrize("obj", VALUES)
-@pytest.mark.parametrize("fmt", FORMATS)
-def test_round_trip(obj, fmt):
-    if fmt == "_test":
-        return
+def _test_round_trip(obj, fmt):
     dumped = dumps(obj, fmt)
 
     # dumps / loads
@@ -104,6 +100,18 @@ def test_round_trip(obj, fmt):
     buf.seek(0)
     # dump / load
     assert obj == load(buf, fmt)
+
+
+@pytest.mark.parametrize("obj", VALUES)
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_round_trip(obj, fmt):
+    if fmt == "_test":
+        return
+
+    with pytest.warns(None) as record:
+        _test_round_trip(obj, fmt)
+
+    assert len(record) == 0
 
 
 @pytest.mark.parametrize("fmt", FORMATS)
@@ -200,3 +208,110 @@ def test_no_dumper_no_loader():
     buf = io.BytesIO()
     with pytest.raises(ValueError):
         load(buf, "test")
+
+
+#
+# Some classes that exercise various parts of pickle's __reduce__() protocol
+#
+class Reduce_string(object):
+    def __reduce__(self):
+        if self is GLOBAL_X:
+            return "GLOBAL_X"
+        elif self is GLOBAL_Y:
+            return "GLOBAL_Y"
+        else:
+            raise Exception("Unknown Reduce_string()")
+
+
+GLOBAL_X = Reduce_string()
+GLOBAL_Y = Reduce_string()
+
+OBJECT_STATE = ("This", "Is", 2, "Object", u"State")
+OBJECT_MEMBERS = ("These", "are", ("object", "members"))
+
+
+class Reduce_x(dict):
+    def __init__(self, *args, **kwargs):
+        try:
+            super(Reduce_x, self).__init__(*args, **kwargs)
+        except Exception:
+            raise Exception(repr(args))
+        self.__dict__ = self
+
+    def extend(self, *args):
+        assert tuple(*args) == OBJECT_MEMBERS
+
+    def __setstate__(self, state):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        assert state == OBJECT_STATE
+
+    def _getstate(self):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        return OBJECT_STATE
+
+    def __setitem__(self, key, value):
+        # State should already have been initialized via __init__, just check
+        # for roundtrip
+        if key in self:
+            assert self[key] == value
+        super(Reduce_x, self).__setitem__(key, value)
+
+    def _initargs(self):
+        args = list(zip(self.keys(), self.values()))
+        return (args,)
+
+
+class Reduce_2(Reduce_x):
+    def __reduce__(self):
+        return (self.__class__, self._initargs())
+
+
+class Reduce_3(Reduce_x):
+    def __reduce__(self):
+        return (self.__class__, self._initargs(), self._getstate())
+
+
+class Reduce_4(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs(),
+            self._getstate(),
+            iter(OBJECT_MEMBERS),
+        )
+
+
+class Reduce_5(Reduce_x):
+    def __reduce__(self):
+        return (
+            self.__class__,
+            self._initargs(),
+            self._getstate(),
+            iter(OBJECT_MEMBERS),
+            zip(self.keys(), self.values()),
+        )
+
+
+@pytest.mark.parametrize("fmt", ["pickle"])
+def test_reduce_string(fmt):
+    # Most formats don't support this (pickle does)
+    _test_round_trip(GLOBAL_X, fmt)
+    _test_round_trip(GLOBAL_Y, fmt)
+
+
+@pytest.mark.parametrize("fmt", FORMATS)
+def test_reduce(fmt):
+    # yaml:legacy exists because it did not handle these case, so skip these tests
+    if fmt == "yaml:legacy" or fmt == "_test":
+        return
+    classes = [Reduce_2, Reduce_3, Reduce_4, Reduce_5]
+    for clsa in classes:
+        a = clsa(a=1, b=2, c=dict(d=3, e=4))
+        _test_round_trip(a, fmt)
+
+        for clsb in classes:
+            b = clsb(f=8, g=9, h=dict(i=9, j=10))
+            a["B"] = b
+            _test_round_trip(b, fmt)
