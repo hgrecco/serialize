@@ -18,7 +18,7 @@ from io import BytesIO
 ClassHelper = namedtuple("ClassHelper", "to_builtin from_builtin")
 
 #: Stores information and function about each format type.
-Format = namedtuple("Format", "extension dump dumps load loads")
+Format = namedtuple("Format", "extension dump dumps load loads register_class")
 UnavailableFormat = namedtuple("UnavailableFormat", "extension msg")
 
 #: Map unavailable formats to the corresponding error message.
@@ -215,7 +215,13 @@ MISSING = object()
 
 
 def register_format(
-    fmt, dumpser=None, loadser=None, dumper=None, loader=None, extension=MISSING
+    fmt,
+    dumpser=None,
+    loadser=None,
+    dumper=None,
+    loader=None,
+    extension=MISSING,
+    register_class=None,
 ):
     """Register an available serialization format.
 
@@ -233,11 +239,22 @@ def register_format(
     `extension` is the file extension used to guess the desired serialization format when loading
     from or dumping to a file. If not given, the part before the colon of `fmt` will be used.
     If `None`, the format will not be associated with any extension.
+
+    `register_class` is a callback made when a class is registered with
+    `serialize.register_class`. When a new format is registered,
+    previously registered classes are called. It takes on argument, the
+    class to register. See `serialize.yaml.py` for an example.
     """
 
     # For simplicity. We do not allow to overwrite format.
     if fmt in FORMATS:
         raise ValueError("%s is already defined." % fmt)
+
+    # Here we generate register_class if it is not present
+    if not register_class:
+
+        def register_class(klass):
+            pass
 
     # Here we generate dumper/dumpser if they are not present.
     if dumper and not dumpser:
@@ -280,10 +297,14 @@ def register_format(
     if extension is MISSING:
         extension = fmt.split(":", 1)[0]
 
-    FORMATS[fmt] = Format(extension, dumper, dumpser, loader, loadser)
+    FORMATS[fmt] = Format(extension, dumper, dumpser, loader, loadser, register_class)
 
     if extension and extension not in FORMAT_BY_EXTENSION:
         FORMAT_BY_EXTENSION[extension.lower()] = fmt
+
+    # register previously registered classes with the new format
+    for klass in CLASSES:
+        FORMATS[fmt].register_class(klass)
 
 
 def register_unavailable(fmt, msg="", pkg="", extension=MISSING):

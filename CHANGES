@@ -8,6 +8,8 @@ Serialize Changelog
 - Added support for simplejson package https://pypi.org/project/simplejson/
 - Fixed bug in yaml support.
 - Added support for pathlib.Path.
+- Call register_class again when a new format is dynamically added.
+  (thanks @jtbraun)
 
 
 0.1 (2016-01-28)
