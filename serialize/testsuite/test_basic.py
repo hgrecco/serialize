@@ -1,6 +1,7 @@
 import io
 import os
 import pathlib
+import sys
 
 import pytest
 
@@ -304,6 +305,7 @@ def test_reduce_string(fmt):
 @pytest.mark.parametrize("fmt", FORMATS)
 @pytest.mark.parametrize("klass1", [Reduce_2, Reduce_3, Reduce_4, Reduce_5])
 @pytest.mark.parametrize("klass2", [Reduce_2, Reduce_3, Reduce_4, Reduce_5])
+@pytest.mark.skipif(sys.version_info < (3, 8), reason="requires python3.8 or higher")
 def test_reduce(fmt, klass1, klass2):
     # yaml:legacy exists because it did not handle these case, so skip these tests
     if fmt == "yaml:legacy" or fmt == "_test":
