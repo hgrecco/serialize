@@ -302,16 +302,16 @@ def test_reduce_string(fmt):
 
 
 @pytest.mark.parametrize("fmt", FORMATS)
-def test_reduce(fmt):
+@pytest.mark.parametrize("klass1", [Reduce_2, Reduce_3, Reduce_4, Reduce_5])
+@pytest.mark.parametrize("klass2", [Reduce_2, Reduce_3, Reduce_4, Reduce_5])
+def test_reduce(fmt, klass1, klass2):
     # yaml:legacy exists because it did not handle these case, so skip these tests
     if fmt == "yaml:legacy" or fmt == "_test":
         return
-    classes = [Reduce_2, Reduce_3, Reduce_4, Reduce_5]
-    for clsa in classes:
-        a = clsa(a=1, b=2, c=dict(d=3, e=4))
-        _test_round_trip(a, fmt)
 
-        for clsb in classes:
-            b = clsb(f=8, g=9, h=dict(i=9, j=10))
-            a["B"] = b
-            _test_round_trip(b, fmt)
+    a = klass1(a=1, b=2, c=dict(d=3, e=4))
+    _test_round_trip(a, fmt)
+
+    b = klass2(f=8, g=9, h=dict(i=9, j=10))
+    a["B"] = b
+    _test_round_trip(b, fmt)
