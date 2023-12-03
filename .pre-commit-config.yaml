@@ -1,13 +1,25 @@
 repos:
--   repo: https://github.com/psf/black
-    rev: 21.12b0
+-   repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
     hooks:
-    - id: black
--   repo: https://github.com/pycqa/isort
-    rev: 5.10.1
+    -   id: check-yaml
+    -   id: end-of-file-fixer
+    -   id: trailing-whitespace
+-   repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.5
     hooks:
-    - id: isort
--   repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+    - id: ruff
+      args: ["--fix"]
+    - id: ruff-format
+-   repo: https://github.com/executablebooks/mdformat
+    rev: 0.7.16
     hooks:
-    - id: flake8
+    - id: mdformat
+      additional_dependencies:
+      - mdformat-gfm  # GitHub-flavored Markdown
+      - mdformat-black
+-   repo: https://github.com/kynan/nbstripout
+    rev: 0.6.1
+    hooks:
+      - id: nbstripout
+        args: [--extra-keys=metadata.kernelspec metadata.language_info.version]

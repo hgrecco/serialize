@@ -1,0 +1,3 @@
+setuptools
+packaging
+typing_extensions

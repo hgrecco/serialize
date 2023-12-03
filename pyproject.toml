@@ -1,0 +1,58 @@
+[project]
+name = "Serialize"
+authors = [
+  {name="Hernan E. Grecco", email="hernan.grecco@gmail.com"}
+]
+license = {text = "BSD-3-Clause"}
+description = "A common API for multiple serialization formats with support for custom classes"
+readme = "README.rst"
+maintainers = [
+  {name="Hernan E. Grecco", email="hernan.grecco@gmail.com"},
+]
+keywords = ["serialization", "deserialization", "packing", "unpacking"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: BSD License",
+    "Operating System :: MacOS :: MacOS X",
+    "Operating System :: Microsoft :: Windows",
+    "Operating System :: POSIX",
+    "Programming Language :: Python",
+    "Topic :: Software Development :: Libraries",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+requires-python = ">=3.9"
+dynamic = ["dependencies", "optional-dependencies", "version"]
+
+[tool.setuptools.package-data]
+serialize = ["py.typed", ]
+
+[tool.setuptools]
+packages = ["serialize"]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+dependencies = {file = "requirements.txt"}
+optional-dependencies.test = {file = "requirements.test.txt"}
+optional-dependencies.full = {file = "requirements.full.txt"}
+
+[project.urls]
+"Homepage" = "https://github.com/hgrecco/serialize"
+"Bug Tracker" = "https://github.com/hgrecco/serialize/issues"
+
+[tool.setuptools_scm]
+
+[tool.pytest.ini_options]
+addopts = "--import-mode=importlib --doctest-modules"
+pythonpath = "src"
+
+[tool.ruff]
+select = ["E", "F", "I"]
+extend-include = ["*.ipynb"]
