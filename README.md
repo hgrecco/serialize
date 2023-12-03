@@ -30,7 +30,7 @@ msgpack:
 
 ```python
 >>> dumps(dict(answer=42), fmt='msgpack')
-b'\x81\xa6answer*'
+b'\x80\x04\x95\x0f\x00\x00\x00\x00\x00\x00\x00}\x94\x8c\x06answer\x94K*s.'
 >>> loads(_, fmt='msgpack')
 {'answer': 42}
 ```
