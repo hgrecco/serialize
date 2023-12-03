@@ -1,13 +1,8 @@
 [![Latest Version](https://img.shields.io/pypi/v/serialize.svg)](https://pypi.python.org/pypi/serialize)
-
 [![License](https://img.shields.io/pypi/l/serialize.svg)](https://pypi.python.org/pypi/serialize)
-
 [![Python Versions](https://img.shields.io/pypi/pyversions/serialize.svg)](https://pypi.python.org/pypi/serialize)
-
 [![CI](https://github.com/hgrecco/serialize/workflows/CI/badge.svg)](https://github.com/hgrecco/serialize/actions?query=workflow%3ACI)
-
 [![LINTER](https://github.com/hgrecco/serialize/workflows/Lint/badge.svg)](https://github.com/hgrecco/serialize/actions?query=workflow%3ALint)
-
 [![Coverage](https://coveralls.io/repos/github/hgrecco/serialize/badge.svg?branch=master)](https://coveralls.io/github/hgrecco/serialize?branch=master)
 
 # Serialize: A common Python API for multiple serialization formats
@@ -19,8 +14,7 @@ There are multiple serialization formats out there ...
 
 But they all have a different API and switching among them is not so
 simple as it should be. Serialize helps you to do it, including dealing
-with custom classes. Let's dump a dict using the
-<span class="title-ref">pickle</span> format:
+with custom classes. Let's dump a dict using the `pickle` format:
 
 ```python
 >>> from serialize import dumps, loads
@@ -42,23 +36,21 @@ b'\x81\xa6answer*'
 ```
 
 Serialize currently support 8 different formats:
-<span class="title-ref">bson</span>,
-<span class="title-ref">dill</span>, <span class="title-ref">json</span>
-(builtin or with simplejson package),
-<span class="title-ref">msgpack</span>,
-<span class="title-ref">phpserialize</span>,
-<span class="title-ref">pickle</span>,
-<span class="title-ref">serpent</span> and
-<span class="title-ref">yaml</span>. Serialize does not implement these
-formats but rather relies on established, well tested packages. If they
-are installed, serialize will use them.
 
-```
-** Serialize allows you to use them all with the same API! **
-```
+- bson
+- dill
+- json (builtin or with simplejson package),
+- msgpack
+- phpserialize
+- pickle
+- serpent
+- yaml
 
-You can also use the <span class="title-ref">dump</span> and
-<span class="title-ref">load</span> to write directly to file-like
+Serialize does not implement these formats but rather relies on established, well tested packages. If they are installed, serialize will use them.
+
+**Serialize allows you to use them all with the same API!**
+
+You can also use the `dump` and `load` to write directly to file-like
 object:
 
 ```python
