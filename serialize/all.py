@@ -384,6 +384,6 @@ def register_class(klass, to_builtin, from_builtin):
     returns an object from the custom class.
 
     In other words:
-        >>> obj == from_builtin(to_builtin(obj))
+        >>> obj == from_builtin(to_builtin(obj))    # doctest: +SKIP
     """
     CLASSES[klass] = CLASSES_BY_NAME[str(klass)] = ClassHelper(to_builtin, from_builtin)
