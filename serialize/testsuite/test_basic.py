@@ -227,7 +227,7 @@ class Reduce_string(object):
 GLOBAL_X = Reduce_string()
 GLOBAL_Y = Reduce_string()
 
-OBJECT_STATE = ("This", "Is", 2, "Object", u"State")
+OBJECT_STATE = ("This", "Is", 2, "Object", "State")
 OBJECT_MEMBERS = ("These", "are", ("object", "members"))
 
 

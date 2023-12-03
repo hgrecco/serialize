@@ -42,5 +42,3 @@ Serialize Changelog
 - Added support for pickle using https://docs.python.org/3/library/pickle.html
 - Added support for serpent using https://pypi.python.org/pypi/serpent
 - Added support for yaml using https://pypi.python.org/pypi/pyyaml
-
-

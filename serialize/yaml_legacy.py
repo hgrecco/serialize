@@ -28,7 +28,6 @@ class Dumper(yaml.Dumper):
 
 class Loader(yaml.Loader):
     def construct_object(self, node, deep=False):
-
         # It seems that pyyaml is changing the internal structure of the node
         tmp = super().construct_object(node, deep)
 

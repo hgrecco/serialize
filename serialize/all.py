@@ -225,8 +225,8 @@ def register_format(
 ):
     """Register an available serialization format.
 
-    `fmt` is a unique string identifying the format, such as `json`. Use a colon (`:`) to
-    separate between subformats.
+    `fmt` is a unique string identifying the format, such as `json`. Use a colon (`:`)
+    to separate between subformats.
 
     `dumpser` and `dumper` should be callables with the same purpose and arguments
     that `json.dumps` and `json.dump`. If one of those is missing, it will be
@@ -236,9 +236,9 @@ def register_format(
     that `json.loads` and `json.load`. If one of those is missing, it will be
     generated automatically from the other.
 
-    `extension` is the file extension used to guess the desired serialization format when loading
-    from or dumping to a file. If not given, the part before the colon of `fmt` will be used.
-    If `None`, the format will not be associated with any extension.
+    `extension` is the file extension used to guess the desired serialization format
+    when loading from or dumping to a file. If not given, the part before the colon of
+    `fmt` will be used. If `None`, the format will not be associated with any extension.
 
     `register_class` is a callback made when a class is registered with
     `serialize.register_class`. When a new format is registered,

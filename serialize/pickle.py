@@ -50,7 +50,6 @@ class DispatchTable(MutableMapping):
 
 
 class MyPickler(pickle.Pickler):
-
     dispatch_table = DispatchTable()
 
 

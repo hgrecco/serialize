@@ -21,7 +21,6 @@ except ImportError:
 
 
 class MyPickler(dill.Pickler):
-
     dispatch_table = pickle.DispatchTable()
 
 
