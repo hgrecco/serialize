@@ -19,7 +19,7 @@ with custom classes. Let's dump a dict using the `pickle` format:
 ```python
 >>> from serialize import dumps, loads
 >>> dumps(dict(answer=42), fmt='pickle')
-b'\x80\x03}q\x00X\x06\x00\x00\x00answerq\x01K*s.'
+b'\x80\x04\x95\x0f\x00\x00\x00\x00\x00\x00\x00}\x94\x8c\x06answer\x94K*s.'
 >>> loads(_, fmt='pickle')
 {'answer': 42}
 ```
@@ -30,7 +30,7 @@ msgpack:
 
 ```python
 >>> dumps(dict(answer=42), fmt='msgpack')
-b'\x80\x04\x95\x0f\x00\x00\x00\x00\x00\x00\x00}\x94\x8c\x06answer\x94K*s.'
+b'\x81\xa6answer*'
 >>> loads(_, fmt='msgpack')
 {'answer': 42}
 ```
@@ -104,9 +104,7 @@ And that's all. You can then use it directly without any hassle:
 
 ```python
 >>> dumps(john, fmt='bson')
-b"y\x00\x00\x00\x03__bson_follow__\x00c\x00\x00\x00\x04__dumped_obj__
-\x00\x1e\x00\x00\x00\x020\x00\x0b\x00\x00\x00John Smith\x00\x101\x00
-\x1b\x00\x00\x00\x00\x02__class_name__\x00\x1c\x00\x00\x00<class '__m
+b"x\x00\x00\x00\x03__bson_follow__\x00b\x00\x00\x00\x02__class_name__\x00\x1b\x00\x00\x00<class 'test_readme.User'>\x00\x04__dumped_obj__\x00\x1e\x00\x00\x00\x020\x00\x0b\x00\x00\x00John Smith\x00\x101\x00\x1b\x00\x00\x00\x00\x00\x00"
 ain__.Username'>\x00\x00\x00"
 >>> v = loads(_, fmt='bson')
 >>> v.name

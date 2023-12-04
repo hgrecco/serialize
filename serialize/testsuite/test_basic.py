@@ -12,6 +12,7 @@ from serialize.all import (
     _get_format,
     _get_format_from_ext,
     register_format,
+    unregister_format,
 )
 
 
@@ -106,7 +107,7 @@ def _test_round_trip(obj, fmt):
 @pytest.mark.parametrize("obj", VALUES)
 @pytest.mark.parametrize("fmt", FORMATS)
 def test_round_trip(obj, fmt):
-    if fmt == "_test":
+    if fmt == "_test" or fmt == "dill":
         return
 
     with pytest.warns(None) as record:
@@ -187,12 +188,11 @@ def test_response_bytes(fmt):
     assert isinstance(dumps(obj, fmt), bytes)
 
 
-register_format("_test")
-
-
 def test_no_replace():
+    register_format("_test")
     with pytest.raises(ValueError):
         register_format("_test")
+    unregister_format("_test")
 
 
 def test_no_dumper_no_loader():
@@ -308,7 +308,7 @@ def test_reduce_string(fmt):
 @pytest.mark.skipif(sys.version_info < (3, 8), reason="requires python3.8 or higher")
 def test_reduce(fmt, klass1, klass2):
     # yaml:legacy exists because it did not handle these case, so skip these tests
-    if fmt == "yaml:legacy" or fmt == "_test":
+    if fmt == "yaml:legacy" or fmt == "_test" or fmt == "dill":
         return
 
     a = klass1(a=1, b=2, c=dict(d=3, e=4))

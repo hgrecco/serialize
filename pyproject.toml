@@ -51,7 +51,7 @@ optional-dependencies.full = {file = "requirements.full.txt"}
 
 [tool.pytest.ini_options]
 addopts = "--import-mode=importlib --doctest-modules"
-pythonpath = "src"
+pythonpath = "."
 
 [tool.ruff]
 select = ["E", "F", "I"]

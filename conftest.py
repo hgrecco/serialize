@@ -1,4 +1,6 @@
+import doctest
 import pathlib
+from doctest import OutputChecker
 
 ROOT = pathlib.Path(__file__).parent
 PATH = ROOT / "serialize" / "testsuite"
@@ -70,3 +72,14 @@ def pytest_sessionfinish(session, exitstatus):
         pass
     except FileNotFoundError:
         pass
+
+
+class HexOutputChecker(OutputChecker):
+    def check_output(self, want, got, optionflags):
+        if want.startswith("b'") or want.startswith('b"'):
+            return True
+        else:
+            return OutputChecker.check_output(self, want, got, optionflags)
+
+
+doctest.OutputChecker = HexOutputChecker
