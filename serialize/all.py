@@ -214,6 +214,11 @@ def traverse_and_decode(obj, decode_func=None, trav_dict=None):
 MISSING = object()
 
 
+def unregister_format(fmt):
+    """Register an available serialization format."""
+    del FORMATS[fmt]
+
+
 def register_format(
     fmt,
     dumpser=None,
